@@ -1,0 +1,18 @@
+{
+  "name": "animeni-uploader",
+  "module": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/main.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@docchi/shinden-description": "^1.0.1",
+    "inquirer": "^12.0.1"
+  }
+}
