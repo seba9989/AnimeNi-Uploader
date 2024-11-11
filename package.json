@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@docchi/shinden-description": "^1.0.1",
-    "inquirer": "^12.0.1"
+    "chromium-bidi": "^0.9.1",
+    "electron": "^33.2.0",
+    "inquirer": "^12.0.1",
+    "playwright": "^1.48.2"
   }
 }

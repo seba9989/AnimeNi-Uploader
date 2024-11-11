@@ -3,6 +3,9 @@ import { download_discribe } from "./shinden";
 import { download_series_img, search_series } from "./tmdb";
 import { add_episodes_tui, new_series_tui } from "./tui";
 import { parseArgs } from "util";
+import { firefox } from "playwright";
+import { add_episode } from "./playwright_scripts";
+import type { EpisodeList } from "./types";
 
 const { values, positionals } = parseArgs({
   args: Bun.argv,
@@ -32,5 +35,30 @@ if (values.new_series) {
   const file = Bun.file(csv_path);
 
   const episodes_array = (await file.text()).split("\n");
-  const series_name = file.name?.split("/").pop()?.replace(".csv", "");
+  const series_name = file.name!.split("/").pop()!.replace(".csv", "");
+
+  let episodes_list: EpisodeList = {};
+  episodes_array.forEach((episode_link) => {
+    if (episode_link == "") return;
+    const episode_number = Number(episode_link.split(/_0*/).pop());
+    const download_url = episode_link.replace(
+      new RegExp("https://filemoon.sx/\\w/"),
+      "https://filemoon.sx/d/",
+    );
+    const embed_url = episode_link.replace(
+      new RegExp("https://filemoon.sx/\\w/"),
+      "https://filemoon.sx/e/",
+    );
+
+    episodes_list = {
+      ...episodes_list,
+      [episode_number]: {
+        download_url,
+        embed_url,
+      },
+    };
+  });
+
+  console.log(episodes_list);
+  add_episode(series_name, episodes_list);
 }
