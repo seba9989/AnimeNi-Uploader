@@ -35,17 +35,24 @@ if (values.new_series) {
   const file = Bun.file(csv_path);
 
   const episodes_array = (await file.text()).split("\n");
-  const series_name = file.name!.split("/").pop()!.replace(".csv", "");
 
+  let series_name: string = "";
   let episodes_list: EpisodeList = {};
-  episodes_array.forEach((episode_link) => {
-    if (episode_link == "") return;
-    const episode_number = Number(episode_link.split(/_0*/).pop());
-    const download_url = episode_link.replace(
+  episodes_array.forEach((row, index) => {
+    if (row == "") return;
+    if (index == 0) {
+      series_name = row;
+      return;
+    }
+
+    const columns = row.split(",");
+
+    const episode_number = columns[0];
+    const download_url = columns[1].replace(
       new RegExp("https://filemoon.sx/\\w/"),
       "https://filemoon.sx/d/",
     );
-    const embed_url = episode_link.replace(
+    const embed_url = columns[1].replace(
       new RegExp("https://filemoon.sx/\\w/"),
       "https://filemoon.sx/e/",
     );
