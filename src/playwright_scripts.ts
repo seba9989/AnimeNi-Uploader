@@ -110,11 +110,11 @@ export const update_episodes = async (
         .click();
       await page
         .getByRole("textbox", { name: "Host Name" })
-        .nth(i + 1)
+        .nth(-1)
         .fill("Lektor");
       await page
         .getByRole("textbox", { name: "Embed" })
-        .nth(i + 1)
+        .nth(-1)
         .fill(
           `<iframe src="${embed_url[i]}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
         );
@@ -124,4 +124,6 @@ export const update_episodes = async (
 
     await wait();
   }
+
+  browser.close();
 };

@@ -56,7 +56,7 @@ if (args.new_series) {
       };
     }
 
-  // console.log(episodes_list);
+  console.log(episodes_list);
   update_episodes(series_name, episodes_list);
 } else {
   const csv_path = await add_episodes_tui();
@@ -95,6 +95,5 @@ if (args.new_series) {
   });
 
   console.log(episodes_list);
-
   add_episode(series_name, episodes_list);
 }
