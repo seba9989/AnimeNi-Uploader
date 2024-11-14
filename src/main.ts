@@ -4,13 +4,16 @@ import { download_series_img, search_series } from "./tmdb";
 import { add_episodes_tui, new_series_tui } from "./tui";
 import { parseArgs } from "util";
 import { firefox } from "playwright";
-import { add_episode } from "./playwright_scripts";
+import { add_episode, update_episodes } from "./playwright_scripts";
 import type { EpisodeList } from "./types";
 
-const { values, positionals } = parseArgs({
+const { values: args, positionals } = parseArgs({
   args: Bun.argv,
   options: {
     new_series: {
+      type: "boolean",
+    },
+    update_episodes: {
       type: "boolean",
     },
   },
@@ -18,7 +21,7 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
 });
 
-if (values.new_series) {
+if (args.new_series) {
   const mal_url = await new_series_tui();
 
   const { series_id, series_name } = mal_data(mal_url);
@@ -67,5 +70,9 @@ if (values.new_series) {
   });
 
   console.log(episodes_list);
-  add_episode(series_name, episodes_list);
+  if (args.update_episodes) {
+    update_episodes(series_name, episodes_list);
+  } else {
+    add_episode(series_name, episodes_list);
+  }
 }

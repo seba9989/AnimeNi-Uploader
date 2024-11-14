@@ -1,10 +1,11 @@
 import { chromium } from "playwright";
 import type { EpisodeList } from "./types";
 
-export const add_episode = async (
-  series_name: string,
-  episodes_list: EpisodeList,
-) => {
+const wait = async (seconds?: number) => {
+  await new Promise((resolve) => setTimeout(resolve, (seconds ?? 10) * 1000));
+};
+
+const login = async () => {
   const login = Bun.env.LOGIN;
   const password = Bun.env.PASSWORD;
 
@@ -20,6 +21,15 @@ export const add_episode = async (
   await page.getByLabel("Hasło", { exact: true }).click();
   await page.getByLabel("Hasło", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Zaloguj się" }).click();
+
+  return { page, browser };
+};
+
+export const add_episode = async (
+  series_name: string,
+  episodes_list: EpisodeList,
+) => {
+  const { page, browser } = await login();
 
   for (const [episode_number, { download_url, embed_url }] of Object.entries(
     episodes_list,
@@ -55,10 +65,55 @@ export const add_episode = async (
       await page.getByRole("textbox", { name: "Embed" }).inputValue(),
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-
     await page.getByRole("button", { name: "Opublikuj", exact: true }).click();
+
+    await wait();
   }
 
   await browser.close();
+};
+
+export const update_episodes = async (
+  series_name: string,
+  episodes_list: EpisodeList,
+) => {
+  const { page, browser } = await login();
+
+  for (const [episode_number, { embed_url }] of Object.entries(episodes_list)) {
+    const episode_name = `${series_name} ${episode_number}`;
+
+    await page.getByRole("link", { name: "Wpisy", exact: true }).click();
+
+    if (page.url() == "https://animeni.pl/wp-admin/edit.php")
+      console.log("Zalogowano");
+
+    await page.getByLabel("Szukaj wpisów:").click();
+    await page.getByLabel("Szukaj wpisów:").fill(episode_name);
+
+    await page.getByRole("button", { name: "Szukaj wpisów" }).click();
+
+    await page.locator("#title").getByRole("link", { name: "Tytuł" }).click();
+
+    await page.getByLabel(`„${episode_name}” (Edycja)`).click();
+
+    await page
+      .locator("#embed-video")
+      .getByRole("link", { name: "+ Add more" })
+      .click();
+
+    await page
+      .getByRole("textbox", { name: "Host Name" })
+      .nth(1)
+      .fill("Lektor");
+    await page
+      .getByRole("textbox", { name: "Embed" })
+      .nth(1)
+      .fill(
+        `<iframe src="${embed_url}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
+      );
+
+    await page.getByRole("button", { name: "Aktualizuj" }).click();
+
+    await wait();
+  }
 };
