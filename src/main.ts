@@ -33,6 +33,31 @@ if (args.new_series) {
   download_series_img(dmdb_id);
 
   download_discribe(series_name);
+} else if (args.update_episodes) {
+  const csv_path = await add_episodes_tui();
+  const file = Bun.file(csv_path);
+
+  const episodes_array = (await file.text()).split("\n");
+
+  let series_name: string = episodes_array.shift()!;
+  let episodes_list: EpisodeList = {};
+
+  for (const row of episodes_array)
+    if (row != "") {
+      const columns = row.split(",");
+
+      const episode_number = columns.shift()!;
+
+      episodes_list = {
+        ...episodes_list,
+        [episode_number]: {
+          embed_url: columns,
+        },
+      };
+    }
+
+  // console.log(episodes_list);
+  update_episodes(series_name, episodes_list);
 } else {
   const csv_path = await add_episodes_tui();
   const file = Bun.file(csv_path);
@@ -70,9 +95,6 @@ if (args.new_series) {
   });
 
   console.log(episodes_list);
-  if (args.update_episodes) {
-    update_episodes(series_name, episodes_list);
-  } else {
-    add_episode(series_name, episodes_list);
-  }
+
+  add_episode(series_name, episodes_list);
 }

@@ -34,6 +34,9 @@ export const add_episode = async (
   for (const [episode_number, { download_url, embed_url }] of Object.entries(
     episodes_list,
   )) {
+    if (typeof embed_url != "string" || !download_url)
+      throw Error("Plik csv jest nie poprawny.");
+
     await page.getByRole("link", { name: "Series", exact: true }).click();
 
     if (page.url() == "https://animeni.pl/wp-admin/edit.php?post_type=anime")
@@ -59,7 +62,7 @@ export const add_episode = async (
     await page
       .getByRole("textbox", { name: "Embed" })
       .fill(
-        `<iframe src="${embed_url}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
+        `<iframe src="${embed_url[0]}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
       );
     console.log(
       await page.getByRole("textbox", { name: "Embed" }).inputValue(),
@@ -80,6 +83,9 @@ export const update_episodes = async (
   const { page, browser } = await login();
 
   for (const [episode_number, { embed_url }] of Object.entries(episodes_list)) {
+    if (typeof embed_url == "string")
+      throw Error("Plik csv jest nie poprawny.");
+
     const episode_name = `${series_name} ${episode_number}`;
 
     await page.getByRole("link", { name: "Wpisy", exact: true }).click();
@@ -96,21 +102,23 @@ export const update_episodes = async (
 
     await page.getByLabel(`„${episode_name}” (Edycja)`).click();
 
-    await page
-      .locator("#embed-video")
-      .getByRole("link", { name: "+ Add more" })
-      .click();
-
-    await page
-      .getByRole("textbox", { name: "Host Name" })
-      .nth(1)
-      .fill("Lektor");
-    await page
-      .getByRole("textbox", { name: "Embed" })
-      .nth(1)
-      .fill(
-        `<iframe src="${embed_url}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
-      );
+    for (let i = 0; i < embed_url.length; i++) {
+      console.log(embed_url[i]);
+      await page
+        .locator("#embed-video")
+        .getByRole("link", { name: "+ Add more" })
+        .click();
+      await page
+        .getByRole("textbox", { name: "Host Name" })
+        .nth(i + 1)
+        .fill("Lektor");
+      await page
+        .getByRole("textbox", { name: "Embed" })
+        .nth(i + 1)
+        .fill(
+          `<iframe src="${embed_url[i]}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
+        );
+    }
 
     await page.getByRole("button", { name: "Aktualizuj" }).click();
 
