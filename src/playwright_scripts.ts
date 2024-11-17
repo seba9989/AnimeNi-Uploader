@@ -62,15 +62,15 @@ export const add_episode = async (
     await page
       .getByRole("textbox", { name: "Embed" })
       .fill(
-        `<iframe src="${embed_url[0]}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
+        `<iframe src="${embed_url}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
       );
     console.log(
       await page.getByRole("textbox", { name: "Embed" }).inputValue(),
     );
 
-    await page.getByRole("button", { name: "Opublikuj", exact: true }).click();
-
     await wait();
+
+    await page.getByRole("button", { name: "Opublikuj", exact: true }).click();
   }
 
   await browser.close();
@@ -120,9 +120,9 @@ export const update_episodes = async (
         );
     }
 
-    await page.getByRole("button", { name: "Aktualizuj" }).click();
-
     await wait();
+
+    await page.getByRole("button", { name: "Aktualizuj" }).click();
   }
 
   browser.close();
