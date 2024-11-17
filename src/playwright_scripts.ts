@@ -31,16 +31,20 @@ export const add_episode = async (
 ) => {
   const { page, browser } = await login();
 
-  for (const [episode_number, { download_url, embed_url }] of Object.entries(
-    episodes_list,
-  )) {
-    if (typeof embed_url != "string" || !download_url)
+  for (
+    const [episode_number, { download_url, embed_url }] of Object.entries(
+      episodes_list,
+    )
+  ) {
+    if (typeof embed_url != "string" || !download_url) {
       throw Error("Plik csv jest nie poprawny.");
+    }
 
     await page.getByRole("link", { name: "Series", exact: true }).click();
 
-    if (page.url() == "https://animeni.pl/wp-admin/edit.php?post_type=anime")
+    if (page.url() == "https://animeni.pl/wp-admin/edit.php?post_type=anime") {
       console.log("Zalogowano");
+    }
 
     const row = page.locator(`tr:has(.row-title:text("${series_name}"))`);
 
@@ -83,24 +87,40 @@ export const update_episodes = async (
   const { page, browser } = await login();
 
   for (const [episode_number, { embed_url }] of Object.entries(episodes_list)) {
-    if (typeof embed_url == "string")
+    if (typeof embed_url == "string") {
       throw Error("Plik csv jest nie poprawny.");
+    }
 
     const episode_name = `${series_name} ${episode_number}`;
 
     await page.getByRole("link", { name: "Wpisy", exact: true }).click();
 
-    if (page.url() == "https://animeni.pl/wp-admin/edit.php")
+    if (page.url() == "https://animeni.pl/wp-admin/edit.php") {
       console.log("Zalogowano");
+    }
 
-    await page.getByLabel("Szukaj wpisów:").click();
     await page.getByLabel("Szukaj wpisów:").fill(episode_name);
 
     await page.getByRole("button", { name: "Szukaj wpisów" }).click();
 
     await page.locator("#title").getByRole("link", { name: "Tytuł" }).click();
 
-    await page.getByLabel(`„${episode_name}” (Edycja)`).click();
+    const episode = page.getByLabel(`„${episode_name}” (Edycja)`);
+    let episode_is_click = false;
+    try {
+      await episode.click({ timeout: 1000 });
+    } catch {
+      while (!episode_is_click) {
+        await page.getByRole("link", { name: "Następna strona" }).first()
+          .click();
+        try {
+          await episode.click({ timeout: 1000 });
+          episode_is_click = true;
+        } catch {
+          episode_is_click = false;
+        }
+      }
+    }
 
     for (let i = 0; i < embed_url.length; i++) {
       console.log(embed_url[i]);
@@ -116,7 +136,9 @@ export const update_episodes = async (
         .getByRole("textbox", { name: "Embed" })
         .nth(-1)
         .fill(
-          `<iframe src="${embed_url[i]}" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
+          `<iframe src="${
+            embed_url[i]
+          }" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="640" height="360" allowfullscreen></iframe>`,
         );
     }
 
