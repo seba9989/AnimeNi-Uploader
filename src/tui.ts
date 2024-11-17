@@ -1,23 +1,10 @@
-import inquirer from "inquirer";
-import { parseArgs } from "util";
-
-export const new_series_tui = async (): Promise<string> => {
-  const { mal_url }: { mal_url: string } = await inquirer.prompt([
-    {
-      name: "mal_url",
-      type: "input",
-      message: "Link do serii na MyAnimeList:",
-    },
-  ]);
-
-  if (!mal_url) {
-    throw new Error("mal_url not exist");
-  }
-  return mal_url;
-};
+// import inquirer from "@inquirer/prompts";
+import Ask from "https://deno.land/x/ask@1.0.6/mod.ts";
 
 export const add_episodes_tui = async () => {
-  const { csv_file }: { csv_file: string } = await inquirer.prompt([
+  const ask = new Ask(); 
+
+  const { csv_file } = await ask.prompt([
     {
       name: "csv_file",
       type: "input",
@@ -26,7 +13,7 @@ export const add_episodes_tui = async () => {
     },
   ]);
 
-  if (!csv_file) {
+  if (typeof csv_file != "string") {
     throw new Error("mal_url not exist");
   }
   return csv_file;

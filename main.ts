@@ -1,45 +1,19 @@
-import { mal_data } from "./mal";
-import { download_discribe } from "./shinden";
-import { download_series_img, search_series } from "./tmdb";
-import { add_episodes_tui, new_series_tui } from "./tui";
-import { parseArgs } from "util";
-import { firefox } from "playwright";
-import { add_episode, update_episodes } from "./playwright_scripts";
-import type { EpisodeList } from "./types";
+import { add_episodes_tui } from "./src/tui.ts";
+import { add_episode, update_episodes } from "./src/playwright_scripts.ts";
+import type { EpisodeList } from "./src/types.ts";
+import { parseArgs } from "jsr:@std/cli/parse-args";
 
-const { values: args, positionals } = parseArgs({
-  args: Bun.argv,
-  options: {
-    new_series: {
-      type: "boolean",
-    },
-    update_episodes: {
-      type: "boolean",
-    },
-  },
-  strict: true,
-  allowPositionals: true,
+const args = parseArgs(Deno.args, {
+  boolean: ["update_episodes"],
 });
 
-if (args.new_series) {
-  const mal_url = await new_series_tui();
-
-  const { series_id, series_name } = mal_data(mal_url);
-
-  console.log(series_id, series_name);
-
-  const dmdb_id = await search_series(series_name);
-
-  download_series_img(dmdb_id);
-
-  download_discribe(series_name);
-} else if (args.update_episodes) {
+if (args.update_episodes) {
   const csv_path = await add_episodes_tui();
-  const file = Bun.file(csv_path);
+  const file = await Deno.readTextFile(csv_path);
 
-  const episodes_array = (await file.text()).split("\n");
+  const episodes_array = file.split("\n");
 
-  let series_name: string = episodes_array.shift()!;
+  const series_name: string = episodes_array.shift()!;
   let episodes_list: EpisodeList = {};
 
   for (const row of episodes_array)
@@ -60,9 +34,9 @@ if (args.new_series) {
   update_episodes(series_name, episodes_list);
 } else {
   const csv_path = await add_episodes_tui();
-  const file = Bun.file(csv_path);
+  const file = await Deno.readTextFile(csv_path);
 
-  const episodes_array = (await file.text()).split("\n");
+  const episodes_array = file.split("\n");
 
   let series_name: string = "";
   let episodes_list: EpisodeList = {};
@@ -97,3 +71,4 @@ if (args.new_series) {
   console.log(episodes_list);
   add_episode(series_name, episodes_list);
 }
+

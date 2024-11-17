@@ -88,3 +88,6 @@ typings/
 .dynamodb/
 
 *.csv
+
+AnimeNi-Uploader.exe
+AnimeNi-Uploader

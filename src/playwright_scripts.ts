@@ -1,13 +1,13 @@
-import { chromium } from "playwright";
-import type { EpisodeList } from "./types";
+import { chromium } from "npm:playwright";
+import type { EpisodeList } from "./types.ts";
 
 const wait = async (seconds?: number) => {
   await new Promise((resolve) => setTimeout(resolve, (seconds ?? 10) * 1000));
 };
 
 const login = async () => {
-  const login = Bun.env.LOGIN;
-  const password = Bun.env.PASSWORD;
+  const login = Deno.env.get("LOGIN");
+  const password = Deno.env.get("PASSWORD");
 
   if (!login) throw Error("Nie podano loginu");
   if (!password) throw Error("Nie podano hasła");
