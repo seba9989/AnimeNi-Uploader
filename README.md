@@ -1,15 +1,24 @@
 # animeni-uploader
 
-To install dependencies:
-
+## Jak używać: *(W skrócie)*
 ```bash
-bun install
+deno run --allow-all main.ts
 ```
 
-To run:
-
-```bash
-bun run src/main.ts
+## Format pliku *.csv
+Plik posiada następującą strukturę nie zależnie od trybu pracy:
+```csv
+Nazwa Serii
+nazwa odcinka(np. 1 lub krwawy księżyc),download_link,embeded_link1,embeded_link2,...
 ```
 
-This project was created using `bun init` in bun v1.1.34. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Flagi trybu:
+- ``--add_embeds`` - tryb dodający nowe *embeds* do istniejących odcinków. 
+
+## Dodatkowe flagi:
+- ``--csv=ścieżka/do/pliku`` - pozwala na ustawienie ścieżki do pliku bez potrzeby ponownego podawania.
+- ``--login=twójLogin`` - pozwala na ustawienie loginu bez potrzeby ponownego podawania.
+- ``--password=twojeHasło`` - pozwala na ustawienie hasła bez potrzeby ponownego podawania.
+
+## P.S. 
+Przy używaniu skompilowanej wersji na **Windows 10/11** nie działa plik .env. Należy użyć flag bądź podać hasło po uruchomieniu programu.
