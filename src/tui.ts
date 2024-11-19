@@ -1,9 +1,29 @@
 import * as i from "@inquirer/prompts";
-import { parseArgs } from "jsr:@std/cli/parse-args";
+import { parseArgs } from "util";
 
-const args = parseArgs(Deno.args, {
-  boolean: ["add_embeds", "add_episodes"],
-  string: ["csv", "login", "password"],
+const { values: args } = parseArgs({
+  args: Bun.argv,
+  options: {
+    add_embeds: {
+      type: "boolean",
+    },
+    add_episodes: {
+      type: "boolean",
+    },
+    csv: {
+      type: "string",
+    },
+    login: {
+      type: "string",
+    },
+    password: {
+      type: "string",
+    },
+    headless: { type: "boolean" },
+  },
+
+  strict: true,
+  allowPositionals: true,
 });
 
 export const mode_tui = async () => {
@@ -16,20 +36,20 @@ export const mode_tui = async () => {
     case args.add_embeds:
       mode = "add_embeds";
       break;
-  }
-
-  if (!mode) {
-    mode = await i.select({
-      message: "Wybierz tryb pracy:",
-      choices: [
-        { name: "Dodaj odcinki", value: "add_episodes" },
-        {
-          name: "Dodaj embeds",
-          value: "add_embeds",
-          description: "Dodawanie kolejnych playerów do istniejących odcinków",
-        },
-      ],
-    });
+    default:
+      mode = await i.select({
+        message: "Wybierz tryb pracy:",
+        choices: [
+          { name: "Dodaj odcinki", value: "add_episodes" },
+          {
+            name: "Dodaj embeds",
+            value: "add_embeds",
+            description:
+              "Dodawanie kolejnych playerów do istniejących odcinków",
+          },
+        ],
+      });
+      break;
   }
 
   return { mode };
@@ -51,8 +71,8 @@ export const csv_tui = async () => {
 };
 
 export const login_tui = async () => {
-  let login = args.login ?? Deno.env.get("LOGIN");
-  let password = args.password ?? Deno.env.get("PASSWORD");
+  let login = args.login ?? Bun.env.LOGIN;
+  let password = args.password ?? Bun.env.PASSWORD;
 
   if (!login) {
     login = await i.input(
@@ -72,3 +92,5 @@ export const login_tui = async () => {
 
   return { login, password };
 };
+
+export const is_headless = !args.headless;

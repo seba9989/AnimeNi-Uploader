@@ -1,11 +1,13 @@
 import { csv_tui, mode_tui } from "./src/tui.ts";
-import { add_embeds, add_episodes } from "./src/puppeteer_scripts.ts";
+import { add_embeds, add_episodes } from "./src/playwright_scripts.ts";
 import type { EpisodeList } from "./src/types.ts";
 
 const csv_path = await csv_tui();
-const file = await Deno.readTextFile(csv_path);
+const file = await Bun.file(csv_path);
 
-const episodes_array = file.split("\n");
+const file_text = await file.text();
+
+const episodes_array = file_text.split("\n");
 
 const series_name: string = episodes_array.shift()!;
 

@@ -3,7 +3,7 @@
 ## Jak używać: _(W skrócie)_
 
 ```bash
-deno run --allow-all main.ts
+bun run main.ts
 ```
 
 ## Format pliku *.csv
@@ -13,6 +13,11 @@ Plik posiada następującą strukturę nie zależnie od trybu pracy:
 ```csv
 Nazwa Serii
 nazwa odcinka(np. 1 lub krwawy księżyc),download_link,embeded_link1,embeded_link2,...
+```
+
+```csv
+Bleach
+75,https://filemoon.sx/d/zwszmfmhn2me/Bleach_00075_Lektor_PL___Wideo,https://filemoon.sx/e/zwszmfmhn2me/Bleach_00075_Lektor_PL___Wideo
 ```
 
 ## Flagi trybu:
@@ -28,8 +33,3 @@ nazwa odcinka(np. 1 lub krwawy księżyc),download_link,embeded_link1,embeded_li
   podawania.
 - `--password=twojeHasło` - pozwala na ustawienie hasła bez potrzeby ponownego
   podawania.
-
-## P.S.
-
-Przy używaniu skompilowanej wersji na **Windows 10/11** nie działa plik .env.
-Należy użyć flag bądź podać hasło po uruchomieniu programu.
