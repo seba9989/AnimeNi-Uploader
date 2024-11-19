@@ -3,6 +3,7 @@
     "dev": "deno run --watch main.ts"
   },
   "imports": {
+    "@inquirer/prompts": "npm:@inquirer/prompts@^7.1.0",
     "@std/assert": "jsr:@std/assert@1",
     "external-editor": "npm:external-editor@3.1.0",
     "playwright": "npm:playwright@^1.48.2",
