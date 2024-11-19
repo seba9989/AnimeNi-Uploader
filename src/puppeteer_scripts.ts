@@ -82,8 +82,11 @@ export const add_episodes = async (
                     "a.page-title-action.ts-cas-add-new",
                 );
                 addButton?.click();
+                break;
             }
         }
+
+        console.log("test");
 
         await page.locator("input[name=post_title]").fill(episode_number);
 
@@ -147,8 +150,7 @@ export const add_embeds = async (
 
         let episode_url;
 
-        let loop = true;
-        while (loop) {
+        while (true) {
             try {
                 await page.locator(
                     `aria/„${series_name} ${episode_number}” (Edycja)`,
@@ -161,9 +163,9 @@ export const add_embeds = async (
                 episode_url = await episode_element?.evaluate((el) => el.href);
 
                 console.log(episode_url);
-                loop = false;
+                
+                break;
             } catch {
-                loop = false;
                 console.log("Nie znaleziono odcinka szukam dalej.");
                 await page.locator("div.top a.next-page").click();
             }
