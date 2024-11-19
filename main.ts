@@ -1,17 +1,13 @@
-import { csv_tui } from "./src/tui.ts";
-import { add_episodes, add_embeds } from "./src/puppeteer_scripts.ts";
+import { csv_tui, mode_tui } from "./src/tui.ts";
+import { add_embeds, add_episodes } from "./src/playwright_scripts.ts";
 import type { EpisodeList } from "./src/types.ts";
-import { parseArgs } from "jsr:@std/cli/parse-args";
 
-const args = parseArgs(Deno.args, {
-  boolean: ["add_embeds"],
-  string: ["csv"],
-});
+const csv_path = await csv_tui();
+const file = await Bun.file(csv_path);
 
-const csv_path = args.csv ? args.csv : await csv_tui();
-const file = await Deno.readTextFile(csv_path);
+const file_text = await file.text();
 
-const episodes_array = file.split("\n");
+const episodes_array = file_text.split("\n");
 
 const series_name: string = episodes_array.shift()!;
 
@@ -34,10 +30,13 @@ for (const row of episodes_array) {
   }
 }
 
-if (args.add_embeds) {
-  console.log(episodes_list);
-  add_embeds(series_name, episodes_list);
-} else {
-  console.log(episodes_list);
-  add_episodes(series_name, episodes_list);
+const { mode } = await mode_tui();
+
+switch (mode) {
+  case "add_episodes":
+    add_episodes(series_name, episodes_list);
+    break;
+  case "add_embeds":
+    add_embeds(series_name, episodes_list);
+    break;
 }
