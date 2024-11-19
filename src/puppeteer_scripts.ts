@@ -1,24 +1,14 @@
 import puppeteer from "npm:puppeteer";
-import { EpisodeList } from "./types.ts";
-import { parseArgs } from "jsr:@std/cli/parse-args";
-import { login_tui } from "./tui.ts";
 
-const args = parseArgs(Deno.args, {
-    string: ["login", "password"],
-});
+import { login_tui } from "./tui.ts";
+import { EpisodeList } from "./types.ts";
 
 const wait = async (seconds?: number) => {
     await new Promise((resolve) => setTimeout(resolve, (seconds ?? 1) * 1000));
 };
 
 const login = async () => {
-    let login = args.login ?? Deno.env.get("LOGIN");
-    let password = args.password ?? Deno.env.get("PASSWORD");
-
-    if (!login || !password) {
-        const login_data = await login_tui();
-        login = login_data.login, password = login_data.password;
-    }
+    const { login, password } = await login_tui();
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -85,8 +75,6 @@ export const add_episodes = async (
                 break;
             }
         }
-
-        console.log("test");
 
         await page.locator("input[name=post_title]").fill(episode_number);
 
@@ -163,7 +151,7 @@ export const add_embeds = async (
                 episode_url = await episode_element?.evaluate((el) => el.href);
 
                 console.log(episode_url);
-                
+
                 break;
             } catch {
                 console.log("Nie znaleziono odcinka szukam dalej.");

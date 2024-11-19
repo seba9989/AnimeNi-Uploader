@@ -1,43 +1,74 @@
-// import inquirer from "@inquirer/prompts";
-import Ask from "https://deno.land/x/ask@1.0.6/mod.ts";
+import * as i from "@inquirer/prompts";
+import { parseArgs } from "jsr:@std/cli/parse-args";
 
-const ask = new Ask();
+const args = parseArgs(Deno.args, {
+  boolean: ["add_embeds", "add_episodes"],
+  string: ["csv", "login", "password"],
+});
+
+export const mode_tui = async () => {
+  let mode: string | undefined;
+
+  switch (true) {
+    case args.add_episodes:
+      mode = "add_episodes";
+      break;
+    case args.add_embeds:
+      mode = "add_embeds";
+      break;
+  }
+
+  if (!mode) {
+    mode = await i.select({
+      message: "Wybierz tryb pracy:",
+      choices: [
+        { name: "Dodaj odcinki", value: "add_episodes" },
+        {
+          name: "Dodaj embeds",
+          value: "add_embeds",
+          description: "Dodawanie kolejnych playerów do istniejących odcinków",
+        },
+      ],
+    });
+  }
+
+  return { mode };
+};
 
 export const csv_tui = async () => {
-  const { csv_file } = await ask.prompt([
-    {
-      name: "csv_file",
-      type: "input",
-      message: "Path to episodes list:",
-      default: "NazwaSerii.csv",
-    },
-  ]);
+  let csv_file = args.csv;
 
-  if (typeof csv_file != "string") {
-    throw new Error("csv_file not exist");
+  if (!csv_file) {
+    csv_file = await i.input(
+      {
+        message: "Ścieżka do pliku:",
+        default: "NazwaSerii.csv",
+      },
+    );
   }
+
   return csv_file;
 };
 
 export const login_tui = async () => {
-  const { login, password } = await ask.prompt([
-    {
-      name: "login",
-      type: "input",
-      message: "Podaj Login:",
-    },
-    {
-      name: "password",
-      type: "input",
-      message: "Podaj Hasło:",
-    },
-  ]);
+  let login = args.login ?? Deno.env.get("LOGIN");
+  let password = args.password ?? Deno.env.get("PASSWORD");
 
-  if (typeof login != "string") {
-    throw new Error("login not exist");
+  if (!login) {
+    login = await i.input(
+      {
+        message: "Podaj Login:",
+      },
+    );
   }
-  if (typeof password != "string") {
-    throw new Error("password not exist");
+
+  if (!password) {
+    password = await i.password(
+      {
+        message: "Podaj Hasło:",
+      },
+    );
   }
+
   return { login, password };
 };
